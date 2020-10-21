@@ -1,0 +1,262 @@
+﻿@page "/"
+@inject HttpClient http
+
+<h3>Inclusão de Pet</h3>
+<hr />
+
+<EditForm Model="@animal" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <form>
+                    <h5><b>Dados Gerais</b></h5> <h6 class="text-muted">(obrigatórios)</h6>
+                    <br />
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label>Nome</label>
+                            <input type="text" class="form-control" placeholder="Nome do Pet" @bind-value="animal.Nome">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Idade</label>
+                            <input type="number" class="form-control" placeholder="Idade" @bind-value="animal.Idade">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Espécie</label>
+                            <select class="form-control" @bind="categoriaEscolhida">
+
+                                <option selected value="0" class="text-muted">Escolha...</option>
+
+                                @foreach (Categoria categoria in categorias)
+                                {
+                                    <option value="@categoria.CategoriaId">@categoria.Nome</option>
+                                }
+
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Raça</label>
+                            <select class="form-control" @bind="racaEscolhida">
+
+                                <option selected value="0" class="text-muted">Escolha...</option>
+
+                                @foreach (Raca raca in racas)
+                                {
+                                    if (categoriaEscolhida == raca.CategoriaId)
+                                    {
+                                        <option value="@raca.RacaId">@raca.Nome</option>
+                                    }
+                                }
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        [[ inserção de fotos ]]
+                    </div>
+
+                    <hr />
+
+                    <h5><b>Dados Específicos</b></h5>
+                    <br />
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label>Descrição</label>
+                            <textarea class="form-control" rows="2" placeholder="Sexo, personalidade, manias..." @bind="animal.Personalidade"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label>Histórico, Vacinação e Chipagem</label>
+                            <textarea class="form-control" rows="2" placeholder="Traumas, adoções, abandonos..." @bind="historico.Anotacoes"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="container row">
+                            <div class="col-md-3">
+
+                                @if (categoriaEscolhida == 1) // Cão
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@animal.Chipado">
+                                        <label class="form-check-label">Chipado</label>
+                                    </div>
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.Raiva">
+                                        <label class="form-check-label">Raiva</label>
+                                    </div>
+                                }
+                                else if (categoriaEscolhida == 2) // Gato
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@animal.Chipado">
+                                        <label class="form-check-label">Chipado</label>
+                                    </div>
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.Raiva">
+                                        <label class="form-check-label">Raiva</label>
+                                    </div>
+                                }
+
+                            </div>
+                            <div class="col-md-3">
+
+                                @if (categoriaEscolhida == 1) // Cão
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V8">
+                                        <label class="form-check-label">Polivalente 8</label>
+                                    </div>
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.Traqueobronquite">
+                                        <label class="form-check-label">Traqueobronquite</label>
+                                    </div>
+                                }
+                                else if (categoriaEscolhida == 2) // Gato
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V3">
+                                        <label class="form-check-label">Polivalente 3</label>
+                                    </div>
+                                }
+
+                            </div>
+                            <div class="col-md-3">
+
+                                @if (categoriaEscolhida == 1) // Cão
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V10">
+                                        <label class="form-check-label">Polivalente 10</label>
+                                    </div>
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.Giardia">
+                                        <label class="form-check-label">Giárdia</label>
+                                    </div>
+                                }
+                                else if (categoriaEscolhida == 2) // Gato
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V4">
+                                        <label class="form-check-label">Polivalente 4</label>
+                                    </div>
+                                }
+
+                            </div>
+                            <div class="col-md-3">
+
+                                @if (categoriaEscolhida == 1) // Cão
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V12">
+                                        <label class="form-check-label">Polivalente 12</label>
+                                    </div>
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.Leishmaniose">
+                                        <label class="form-check-label">Leishmaniose</label>
+                                    </div>
+                                }
+                                else if (categoriaEscolhida == 2) // Gato
+                                {
+                                    <div class="row form-check">
+                                        <input class="form-check-input" type="checkbox" @bind="@vacina.V5">
+                                        <label class="form-check-label">Polivalente 5</label>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <hr />
+
+                <button type="submit" class="btn btn-outline-success">
+                    Adicionar Pet
+                </button>
+            </div>
+
+            <div class="col-4">
+                <div class="card">
+                    <p>Nome @animal.Nome</p>
+                    <p>Idade @animal.Idade</p>
+                    <p>Raça ID @racaEscolhida</p>
+                    <p>Chipado @animal.Chipado</p>
+                    <p>Descrição @animal.Personalidade</p>
+                    <p>Anotações @historico.Anotacoes</p>
+                    <p>V8 C @vacina.V8</p>
+                    <p>V10 C @vacina.V10</p>
+                    <p>V12 C @vacina.V12</p>
+                    <p>Traqueo C @vacina.Traqueobronquite</p>
+                    <p>Giardia C @vacina.Giardia</p>
+                    <p>Leish C @vacina.Leishmaniose</p>
+                    <p>Raiva @vacina.Raiva</p>
+                    <p>V3 G @vacina.V3</p>
+                    <p>V4 G @vacina.V4</p>
+                    <p>V5 G @vacina.V5</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code
+{
+    Animal animal = new Animal();
+    Historico historico = new Historico();
+    Vacina vacina = new Vacina();
+
+    Foto foto1 = new Foto();
+    Foto foto2 = new Foto();
+    Foto foto3 = new Foto();
+
+    int categoriaEscolhida;
+    List<Categoria> categorias = new List<Categoria>();
+
+    int racaEscolhida;
+    List<Raca> racas = new List<Raca>();
+
+    List<Animal> animais = new List<Animal>();
+    List<Historico> historicos = new List<Historico>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categorias = await http.GetFromJsonAsync<List<Categoria>>("api/Categorias");
+        racas = await http.GetFromJsonAsync<List<Raca>>("api/Racas");
+    }
+
+    async Task OnValidSubmit()
+    {
+        animal.CategoriaId = categoriaEscolhida;
+        animal.RacaId = racaEscolhida;
+        animal.OngId = 1; // depende de quem está logado... TO DO
+        await http.PostAsJsonAsync<Animal>("api/Animals", animal);
+
+        Console.WriteLine("animal");
+
+        animais = await http.GetFromJsonAsync<List<Animal>>("api/Animals");
+        var ultimoAnimal = animais[animais.Count];
+        historico.AnimalId = ultimoAnimal.AnimalId;
+        historico.VacinasId = ultimoAnimal.AnimalId;
+        await http.PostAsJsonAsync<Historico>("api/Historicos", historico);
+
+        Console.WriteLine("historico");
+
+        animais = await http.GetFromJsonAsync<List<Animal>>("api/Animals");
+        var ultimoHistorico = historicos[historicos.Count];
+        vacina.HistoricoId = ultimoHistorico.HistoricoId;
+        await http.PostAsJsonAsync<Vacina>("api/Vacinas", vacina);
+
+        Console.WriteLine("vacinas");
+
+        foto1.AnimalId = ultimoAnimal.AnimalId;
+        foto2.AnimalId = ultimoAnimal.AnimalId;
+        foto3.AnimalId = ultimoAnimal.AnimalId;
+        await http.PostAsJsonAsync<Foto>("api/Fotos", foto1);
+        await http.PostAsJsonAsync<Foto>("api/Fotos", foto2);
+        await http.PostAsJsonAsync<Foto>("api/Fotos", foto3);
+
+        Console.WriteLine("fotos");
+    }
+}
