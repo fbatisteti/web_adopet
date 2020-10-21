@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject HttpClient http
+@inject NavigationManager nav
 
 <h3>Inclusão de Pet</h3>
 <hr />
@@ -233,22 +234,16 @@
         animal.OngId = 1; // depende de quem está logado... TO DO
         await http.PostAsJsonAsync<Animal>("api/Animals", animal);
 
-        Console.WriteLine("animal");
-
         animais = await http.GetFromJsonAsync<List<Animal>>("api/Animals");
-        var ultimoAnimal = animais[animais.Count];
+        var ultimoAnimal = animais[animais.Count - 1];
         historico.AnimalId = ultimoAnimal.AnimalId;
         historico.VacinasId = ultimoAnimal.AnimalId;
         await http.PostAsJsonAsync<Historico>("api/Historicos", historico);
 
-        Console.WriteLine("historico");
-
-        animais = await http.GetFromJsonAsync<List<Animal>>("api/Animals");
-        var ultimoHistorico = historicos[historicos.Count];
+        historicos = await http.GetFromJsonAsync<List<Historico>>("api/Historicos");
+        var ultimoHistorico = historicos[historicos.Count - 1];
         vacina.HistoricoId = ultimoHistorico.HistoricoId;
         await http.PostAsJsonAsync<Vacina>("api/Vacinas", vacina);
-
-        Console.WriteLine("vacinas");
 
         foto1.AnimalId = ultimoAnimal.AnimalId;
         foto2.AnimalId = ultimoAnimal.AnimalId;
@@ -257,6 +252,6 @@
         await http.PostAsJsonAsync<Foto>("api/Fotos", foto2);
         await http.PostAsJsonAsync<Foto>("api/Fotos", foto3);
 
-        Console.WriteLine("fotos");
+        nav.NavigateTo($"/check/{ultimoAnimal.AnimalId}");
     }
 }

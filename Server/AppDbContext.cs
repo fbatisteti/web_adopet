@@ -77,6 +77,48 @@ namespace web_adopet.Server
             modelBuilder.Entity<Categoria>()
                 .HasMany(c => c.Racas)
                 .WithOne(r => r.Categoria);
+
+            // SEEDING
+            modelBuilder.Entity<Categoria>()
+                .HasData(
+                    new Categoria
+                    {
+                        CategoriaId = 1,
+                        Nome = "Cão"
+                    },
+
+                    new Categoria
+                    {
+                        CategoriaId = 2,
+                        Nome = "Gato"
+                    }
+                );
+
+            modelBuilder.Entity<Raca>()
+                .HasData(
+                    new Raca
+                    {
+                        RacaId = 1,
+                        Nome = "Vira-Lata",
+                        CategoriaId = 1
+                    },
+
+                    new Raca
+                    {
+                        RacaId = 2,
+                        Nome = "Vira-Lata",
+                        CategoriaId = 2
+                    }
+                );
+
+            modelBuilder.Entity<Ong>()
+                .HasData(
+                    new Ong
+                    {
+                        OngId = 1,
+                        Nome = "ONG"
+                    }
+                );
         }
     }
 }

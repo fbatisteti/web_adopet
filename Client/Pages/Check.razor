@@ -1,0 +1,81 @@
+﻿@page "/check"
+@page "/check/{AnimalId:int}"
+@inject HttpClient http
+@inject NavigationManager nav
+
+<h3>Conferência de Pet</h3>
+<hr />
+
+<div class="form-group col-3">
+    <label>Pet:</label>
+    <select class="form-control" @bind="animalEscolhido">
+
+        @foreach (Animal animal in animais)
+        {
+            <option value="@animal.AnimalId">@animal.Nome</option>
+        }
+
+    </select>
+</div>
+
+<hr />
+
+@if (animal != null)
+{
+    <div class="card" style="width: 18rem;">
+        <img src="..." class="card-img-top">
+        <div class="card-body">
+            <h5 class="card-title">@animal.Nome</h5>
+            <p class="card-text">@animal.Idade ano(s). @animal.Categoria.Nome, @animal.Raca.Nome.</p>
+            <p class="card-text">@animal.Personalidade</p>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Cras justo odio</li>
+            <li class="list-group-item">Dapibus ac facilisis in</li>
+            <li class="list-group-item">Vestibulum at eros</li>
+        </ul>
+        <div class="card-body">
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int AnimalId { get; set; }
+
+    List<Animal> animais = new List<Animal>();
+    List<Historico> historicos = new List<Historico>();
+    List<Vacina> vacinas = new List<Vacina>();
+    List<Foto> fotos = new List<Foto>();
+
+    Animal animal = new Animal();
+    Historico historico = new Historico();
+    Vacina vacina = new Vacina();
+
+    int animalEscolhido;
+
+    protected override async Task OnInitializedAsync()
+    {
+        animais = await http.GetFromJsonAsync<List<Animal>>("api/Animals");
+        historicos = await http.GetFromJsonAsync<List<Historico>>("api/Historicos");
+        vacinas = await http.GetFromJsonAsync<List<Vacina>>("api/Vacinas");
+        fotos = await http.GetFromJsonAsync<List<Foto>>("api/Fotos");
+
+        if (AnimalId != 0)
+        {
+            try
+            {
+                animal = await http.GetFromJsonAsync<Animal>($"api/Animals/{AnimalId}");
+            }
+            catch
+            {
+                animal = new Animal();
+            }
+        }
+        else
+        {
+            animal = new Animal();
+        }
+    }
+}
