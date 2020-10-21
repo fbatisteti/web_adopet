@@ -252,6 +252,6 @@
         await http.PostAsJsonAsync<Foto>("api/Fotos", foto2);
         await http.PostAsJsonAsync<Foto>("api/Fotos", foto3);
 
-        nav.NavigateTo($"/check/{ultimoAnimal.AnimalId}");
+        nav.NavigateTo("/check");
     }
 }

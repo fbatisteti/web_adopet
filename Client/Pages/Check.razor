@@ -10,6 +10,8 @@
     <label>Pet:</label>
     <select class="form-control" @bind="animalEscolhido">
 
+        <option selected value="" class="text-muted">Selecione...</option>
+
         @foreach (Animal animal in animais)
         {
             <option value="@animal.AnimalId">@animal.Nome</option>
@@ -20,25 +22,91 @@
 
 <hr />
 
-@if (animal != null)
+@foreach (Animal animal in animais)
 {
-    <div class="card" style="width: 18rem;">
-        <img src="..." class="card-img-top">
-        <div class="card-body">
-            <h5 class="card-title">@animal.Nome</h5>
-            <p class="card-text">@animal.Idade ano(s). @animal.Categoria.Nome, @animal.Raca.Nome.</p>
-            <p class="card-text">@animal.Personalidade</p>
+    if (animalEscolhido == animal.AnimalId)
+    {
+        <div class="card" style="width: 18rem;">
+            <img src="@( GetFoto(animal.AnimalId) )" class="card-img-top" >
+            <div class="card-body">
+                <h5 class="card-title">@animal.Nome</h5>
+                <p class="card-text">@animal.Idade ano(s). @( GetCategoria(animal.CategoriaId) ), @( GetRaca(animal.RacaId) ).</p>
+                <p class="card-text">@animal.Personalidade</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+
+                    @foreach (Historico historico in historicos)
+                    {
+                        if (historico.AnimalId == animal.AnimalId)
+                        {
+                            <div>@historico.Anotacoes</div>
+                        }
+                    }
+
+                </li>
+                <li class="list-group-item">
+
+                    @if (animal.Chipado)
+                    {
+                        <div>Chipado</div>
+                    }
+                    else
+                    {
+                        <div>NÃO chipado</div>
+                    }
+
+                </li>
+                <li class="list-group-item">Vacinas:
+                
+                    <ul>
+
+                        @foreach (Historico historico in historicos)
+                        {
+                            if (historico.AnimalId == animal.AnimalId)
+                            {
+                                foreach (Vacina vacina in vacinas)
+                                {
+                                    if (vacina.HistoricoId == historico.HistoricoId)
+                                    {
+                                        switch (animal.CategoriaId)
+                                        {
+                                            case 1: // Cão
+                                                <li>V8: @( GetVacina(vacina.V8) )</li>
+                                                <li>V10: @( GetVacina(vacina.V10) )</li>
+                                                <li>V12: @( GetVacina(vacina.V12) )</li>
+                                                <li>Traqueobronquite: @( GetVacina(vacina.Traqueobronquite) )</li>
+                                                <li>Giárdia: @( GetVacina(vacina.Giardia) )</li>
+                                                <li>Leishmaniose: @( GetVacina(vacina.Leishmaniose) )</li>
+                                                <li>Raiva: @( GetVacina(vacina.Raiva) )</li>
+                                                break;
+
+                                            case 2: // Gato
+                                                <li>V3: @( GetVacina(vacina.V3) )</li>
+                                                <li>V4: @( GetVacina(vacina.V4) )</li>
+                                                <li>V5: @( GetVacina(vacina.V5) )</li>
+                                                <li>Raiva: @( GetVacina(vacina.Raiva) )</li>
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    </ul>
+                
+                </li>
+            </ul>
+            <div class="card-body">
+                <a href="#" class="card-link">Editar</a>
+                <a href="#" class="card-link">Apagar</a>
+            </div>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-        </ul>
-        <div class="card-body">
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
-        </div>
-    </div>
+        return;
+    }
 }
 
 @code {
@@ -48,6 +116,8 @@
     List<Historico> historicos = new List<Historico>();
     List<Vacina> vacinas = new List<Vacina>();
     List<Foto> fotos = new List<Foto>();
+    List<Categoria> categorias = new List<Categoria>();
+    List<Raca> racas = new List<Raca>();
 
     Animal animal = new Animal();
     Historico historico = new Historico();
@@ -61,6 +131,8 @@
         historicos = await http.GetFromJsonAsync<List<Historico>>("api/Historicos");
         vacinas = await http.GetFromJsonAsync<List<Vacina>>("api/Vacinas");
         fotos = await http.GetFromJsonAsync<List<Foto>>("api/Fotos");
+        categorias = await http.GetFromJsonAsync<List<Categoria>>("api/Categorias");
+        racas = await http.GetFromJsonAsync<List<Raca>>("api/Racas");
 
         if (AnimalId != 0)
         {
@@ -77,5 +149,45 @@
         {
             animal = new Animal();
         }
+    }
+
+    public string GetCategoria(int id)
+    {
+        foreach (Categoria categoria in categorias)
+        {
+            if (categoria.CategoriaId == id)
+            {
+                return categoria.Nome;
+            }
+        }
+
+        return "[faltando]";
+    }
+
+    public string GetRaca(int id)
+    {
+        foreach (Raca raca in racas)
+        {
+            if (raca.RacaId == id)
+            {
+                return raca.Nome;
+            }
+        }
+
+        return "[faltando]";
+    }
+
+    public string GetVacina(bool check) => check ? "Sim" : "Não";
+
+    public string GetFoto(int id)
+    {
+        foreach (Foto foto in fotos)
+        {
+            if (foto.AnimalId == id)
+            {
+                return foto.Url;
+            }
+        }
+        return "[faltando]";
     }
 }
